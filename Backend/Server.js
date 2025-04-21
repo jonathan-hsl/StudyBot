@@ -85,17 +85,34 @@ Ensure the JSON is valid.
 Content:
 ${extractedText}`;
 
-    const openaiResponse = await axios.post('https://api.openai.com/v1/completions', {
-      model: "text-davinci-003",
-      prompt: prompt,
-      max_tokens: 800,
-      temperature: 0.7,
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+    // NEW
+const openaiResponse = await axios.post(
+  "https://api.openai.com/v1/chat/completions",
+  {
+    model: "gpt-3.5-turbo",                 // any chat‑capable model
+    messages: [
+      {
+        role: "system",
+        content:
+          `You are an expert study assistant. ` +
+          `Return ONLY valid JSON with keys summary, detailedNotes, flashcards, quizzes.`
+      },
+      {
+        role: "user",
+        content: prompt                      // same prompt string you built
       }
-    });
+    ],
+    max_tokens: 900,
+    temperature: 0.3
+  },
+  {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+    }
+  }
+);
+
 
     let responseText = openaiResponse.data.choices[0].text.trim();
     let resultJSON;
